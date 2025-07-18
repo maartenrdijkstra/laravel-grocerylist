@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreItemRequest;
 use App\Http\Requests\UpdateItemRequest;
 use App\Models\Item;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class ItemController extends Controller
@@ -13,7 +14,7 @@ class ItemController extends Controller
      * Display a listing of the resource.
      */
     public function index() {
-        $items = Item::all();
+        $items = Item::with('category')->get();
         return view('items.index', compact('items'));
     }
 
@@ -22,7 +23,8 @@ class ItemController extends Controller
      */
     public function create()
     {
-        return view('items.create');
+        $categories = Category::all();
+        return view('items.create', compact('categories'));
     }
 
     /**
@@ -35,11 +37,8 @@ class ItemController extends Controller
 
         $item = new Item();
 
-        // Stelt de 'name' en 'description' waarden in op het gevalideerde gegevens
-        $item->name = $validated['name'];
-        $item->description = $validated['description'];
-
-        $item->save();
+        // Maakt een nieuw item aan met de gevalideerde gegevens
+        Item::create($validated);
 
         return redirect()->route('items.index');
     }
@@ -58,7 +57,8 @@ class ItemController extends Controller
      */
     public function edit($id) {
         $item = Item::find($id);
-        return view('items.edit', compact('item'));
+        $categories = Category::all();
+        return view('items.edit', compact('item', 'categories'));
     }
 
     /**
@@ -69,11 +69,8 @@ class ItemController extends Controller
         // Haalt de gevalideerde gegevens op uit de UpdateItemRequest class
         $validated = $request->validated();
 
-        // Stelt de 'name' en 'description' waarden in op het gevalideerde gegevens
-        $item->name = $validated['name'];
-        $item->description = $validated['description'];
-
-        $item->save();
+        // Werkt het item bij met de gevalideerde gegevens
+        $item->update($validated);
 
         return redirect()->route('items.index');
     }
