@@ -35,8 +35,6 @@ class ItemController extends Controller
         // Haalt de gevalideerde gegevens op uit de StoreItemRequest class
         $validated = $request->validated();
 
-        $item = new Item();
-
         // Maakt een nieuw item aan met de gevalideerde gegevens
         Item::create($validated);
 
@@ -46,17 +44,15 @@ class ItemController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Item $item)
     {
-        $item = Item::find($id);
         return view('items.show', compact('item'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id) {
-        $item = Item::find($id);
+    public function edit(Item $item) {
         $categories = Category::all();
         return view('items.edit', compact('item', 'categories'));
     }
